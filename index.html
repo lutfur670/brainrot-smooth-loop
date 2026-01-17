@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Brainrot Smooth Loop + Snow + Hover Pause</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #111;
+  font-family: sans-serif;
+}
+
+/* Common styles */
+.shape, .emoji, .glitch-text, .snowflake {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  mix-blend-mode: screen;
+}
+
+/* Floating objects */
+.shape {
+  border-radius: 50%;
+}
+
+.emoji {
+  font-size: 2rem;
+  pointer-events: auto; /* Needed to allow hover */
+  cursor: pointer;
+}
+
+.glitch-text {
+  font-size: 3rem;
+  font-weight: bold;
+  color: white;
+  pointer-events: auto; /* Needed to allow hover */
+  cursor: pointer;
+}
+
+/* Snowflakes */
+.snowflake {
+  color: white;
+  font-size: 8px;
+  opacity: 0.8;
+  animation-name: fall;
+  animation-timing-function: linear;
+}
+
+@keyframes fall {
+  0% { transform: translateY(-10px); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(110vh); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<script>
+const colors = ["#ff0055","#00ffcc","#ffff00","#ff00ff","#00ffff","#ff8800","#88ff00","#0088ff"];
+const emojis = ["💀","👾","🌀","🔥","✨","🤯","💫","🎉"];
+const glitchWords = ["BRAIN","ROT","CHAOS","LOOP","😵‍💫","ERROR"];
+
+const objects = [];
+const numObjects = 50;
+let vw = window.innerWidth;
+let vh = window.innerHeight;
+
+// Helper functions
+function random(min, max) { return Math.random() * (max - min) + min; }
+function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+// Create smooth floating objects
+for (let i = 0; i < numObjects; i++) {
+  let div;
+  const type = i % 3;
+
+  if (type === 0) {
+    div = document.createElement("div");
+    div.classList.add("shape");
+    const size = random(20, 80);
+    div.style.width = div.style.height = size + "px";
+    div.style.background = pick(colors);
+    div.hoverPaused = false; // not hoverable
+  } else if (type === 1) {
+    div = document.createElement("div");
+    div.classList.add("emoji");
+    div.textContent = pick(emojis);
+    div.hoverPaused = false;
+    // add hover events
+    div.addEventListener("mouseenter", () => div.hoverPaused = true);
+    div.addEventListener("mouseleave", () => div.hoverPaused = false);
+  } else {
+    div = document.createElement("div");
+    div.classList.add("glitch-text");
+    div.textContent = pick(glitchWords);
+    div.hoverPaused = false;
+    div.addEventListener("mouseenter", () => div.hoverPaused = true);
+    div.addEventListener("mouseleave", () => div.hoverPaused = false);
+  }
+
+  // Random starting position
+  const startX = random(0, vw);
+  const startY = random(0, vh);
+  div.startX = startX;
+  div.startY = startY;
+  div.style.left = startX + "px";
+  div.style.top = startY + "px";
+
+  // Random amplitude for smooth movement
+  div.amplitudeX = random(50, 300);
+  div.amplitudeY = random(50, 300);
+  div.speed = random(0.002, 0.008);
+  div.offset = random(0, Math.PI*2);
+
+  document.body.appendChild(div);
+  objects.push(div);
+}
+
+// Animation loop for smooth sinusoidal movement
+let t = 0;
+function animate() {
+  t += 1;
+  objects.forEach(obj => {
+    if (!obj.hoverPaused) {
+      const x = obj.amplitudeX * Math.sin(t * obj.speed + obj.offset);
+      const y = obj.amplitudeY * Math.cos(t * obj.speed + obj.offset);
+      obj.style.transform = `translate(${x}px, ${y}px)`;
+    }
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Snowfall effect
+function createSnowflake() {
+  const flake = document.createElement("div");
+  flake.classList.add("snowflake");
+  flake.textContent = "❄"; // snow emoji
+  const size = random(5, 12);
+  flake.style.fontSize = size + "px";
+  flake.style.left = random(0, vw) + "px";
+  flake.style.top = "-20px";
+  const duration = random(6, 15) + "s";
+  flake.style.animationDuration = duration;
+
+  document.body.appendChild(flake);
+
+  setTimeout(() => flake.remove(), parseFloat(duration)*1000);
+}
+
+// Continuously spawn snowflakes
+setInterval(createSnowflake, 150);
+
+window.addEventListener('resize', () => {
+  vw = window.innerWidth;
+  vh = window.innerHeight;
+});
+</script>
+
+</body>
+</html>
