@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Brainrot + Snow + Stars</title>
+<title>Brainrot + Snow + Rainbow Stars</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 html, body {
@@ -24,9 +24,7 @@ html, body {
 }
 
 /* Floating objects */
-.shape {
-  border-radius: 50%;
-}
+.shape { border-radius: 50%; }
 
 .emoji {
   font-size: 2rem;
@@ -56,13 +54,13 @@ html, body {
   width: 2px;
   height: 2px;
   border-radius: 50%;
-  background: white;
   opacity: 0;
   animation-name: blink;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
 }
 
+/* Animations */
 @keyframes fall {
   0% { transform: translateY(-10px); opacity: 0; }
   10% { opacity: 1; }
@@ -78,7 +76,11 @@ html, body {
 <body>
 
 <script>
-const colors = ["#ff0055","#00ffcc","#ffff00","#ff00ff","#00ffff","#ff8800","#88ff00","#0088ff"];
+const colors = ["#ff0055","#00ffcc","#ffff00","#ff00ff","#00ffff","#ff8800","#88ff00","#0088ff",
+                "#ff4444","#44ff44","#4444ff","#ff44ff","#44ffff","#ffff44","#ffa500","#ff1493",
+                "#7fff00","#00ff7f","#1e90ff","#ff69b4","#8a2be2","#7b68ee","#00fa9a","#ffd700",
+                "#ff4500","#ff6347","#40e0d0","#ba55d3","#ffb6c1"]; // 30 colors
+
 const emojis = ["💀","👾","🌀","🔥","✨","🤯","💫","🎉"];
 const glitchWords = ["BRAIN","ROT","CHAOS","LOOP","😵‍💫","ERROR"];
 
@@ -87,7 +89,7 @@ const numObjects = 50;
 let vw = window.innerWidth;
 let vh = window.innerHeight;
 
-// Helper functions
+// Helper
 function random(min, max) { return Math.random() * (max - min) + min; }
 function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
 
@@ -121,7 +123,6 @@ for (let i = 0; i < numObjects; i++) {
     div.addEventListener("mouseleave", () => div.hoverPaused = false);
   }
 
-  // Random starting position
   const startX = random(0, vw);
   const startY = random(0, vh);
   div.startX = startX;
@@ -129,7 +130,6 @@ for (let i = 0; i < numObjects; i++) {
   div.style.left = startX + "px";
   div.style.top = startY + "px";
 
-  // Random amplitude for smooth movement
   div.amplitudeX = random(50, 300);
   div.amplitudeY = random(50, 300);
   div.speed = random(0.002, 0.008);
@@ -166,16 +166,16 @@ function createSnowflake() {
   flake.style.left = random(0, vw) + "px";
   flake.style.top = "-20px";
   flake.style.animationDuration = random(6, 15) + "s";
-
   document.body.appendChild(flake);
   setTimeout(() => flake.remove(), parseFloat(flake.style.animationDuration)*1000);
 }
 setInterval(createSnowflake, 150);
 
 // ---------------------------
-// Stars
+// Stars with random colors
 // ---------------------------
 const numStars = 200;
+const starElements = [];
 for (let i = 0; i < numStars; i++) {
   const star = document.createElement("div");
   star.classList.add("star");
@@ -184,10 +184,18 @@ for (let i = 0; i < numStars; i++) {
   star.style.height = size + "px";
   star.style.left = random(0, vw) + "px";
   star.style.top = random(0, vh) + "px";
-  star.style.animationDuration = random(1, 4) + "s"; // random blinking speed
-  star.style.animationDelay = random(0, 4) + "s"; // stagger stars
+  star.style.animationDuration = random(1, 4) + "s";
+  star.style.animationDelay = random(0, 4) + "s";
   document.body.appendChild(star);
+  starElements.push(star);
 }
+
+// Randomly change each star color continuously
+setInterval(() => {
+  starElements.forEach(star => {
+    star.style.background = pick(colors);
+  });
+}, 500); // change every 0.5s
 
 // Update viewport on resize
 window.addEventListener('resize', () => {
